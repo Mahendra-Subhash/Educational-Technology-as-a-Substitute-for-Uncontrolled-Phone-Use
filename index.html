@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DTI Problem Statement — Educational Technology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:   #021526;
+  --blue:   #065A82;
+  --teal:   #17C3B2;
+  --gold:   #FFD166;
+  --red:    #EF4444;
+  --orange: #F97316;
+  --slate:  #94A3B8;
+  --card:   #0A2540;
+  --card2:  #0D2E50;
+  --white:  #FFFFFF;
+  --text:   #CBD5E1;
+  --muted:  #64748B;
+  --border: rgba(23,195,178,0.2);
+  --glow:   rgba(23,195,178,0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ───────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── ANIMATED GRID BG ────────────────────────── */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(23,195,178,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23,195,178,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ─────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(2,21,38,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--teal);
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--slate);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--teal); }
+
+/* ── HERO ─────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8rem 2rem 4rem;
+  overflow: hidden;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+.hero-orb-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(23,195,178,0.15), transparent 70%);
+  top: -100px; right: -100px;
+  animation: drift 8s ease-in-out infinite alternate;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(6,90,130,0.2), transparent 70%);
+  bottom: 0; left: -100px;
+  animation: drift 10s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(30px,20px) scale(1.05); }
+}
+
+.hero-inner {
+  max-width: 900px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--teal);
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--teal);
+  margin-bottom: 2rem;
+  animation: fadeDown 0.6s ease both;
+}
+
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--teal);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.8); }
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--white);
+  animation: fadeDown 0.6s 0.1s ease both;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .accent { color: var(--teal); }
+.hero-title .gold   { color: var(--gold); }
+
+.hero-sub {
+  margin-top: 1.5rem;
+  font-size: 1.15rem;
+  color: var(--slate);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeDown 0.6s 0.2s ease both;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+  animation: fadeDown 0.6s 0.3s ease both;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  background: var(--teal);
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(23,195,178,0.3);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 2rem;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ── STATS STRIP ─────────────────────────────── */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-top: 4rem;
+  animation: fadeDown 0.6s 0.4s ease both;
+}
+.stat-item {
+  padding: 2rem;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--teal);
+}
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.25rem;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTIONS ─────────────────────────────────── */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--teal);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.section-desc {
+  color: var(--slate);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin-bottom: 3rem;
+}
+
+/* ── DIVIDER ──────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  margin: 0 2rem;
+  opacity: 0.3;
+}
+
+/* ── CARDS GRID ───────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--teal), transparent);
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.card-text {
+  font-size: 0.9rem;
+  color: var(--slate);
+  line-height: 1.65;
+}
+
+/* ── BIG STAT CARDS ───────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: scale(1.03); }
+
+.stat-card .big-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-card .desc {
+  font-size: 0.85rem;
+  color: var(--slate);
+}
+
+/* ── COMPARISON TABLE ─────────────────────────── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.compare-table th {
+  padding: 1rem 1.5rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: left;
+  letter-spacing: 0.05em;
+}
+
+.compare-table th:nth-child(1) { background: var(--card2); color: var(--slate); width: 25%; }
+.compare-table th:nth-child(2) { background: rgba(239,68,68,0.2); color: #FCA5A5; width: 37.5%; }
+.compare-table th:nth-child(3) { background: rgba(23,195,178,0.15); color: var(--teal); width: 37.5%; }
+
+.compare-table td {
+  padding: 0.9rem 1.5rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.compare-table tr:last-child td { border-bottom: none; }
+
+.compare-table td:nth-child(1) { background: var(--card2); color: var(--teal); font-weight: 600; font-size: 0.85rem; }
+.compare-table td:nth-child(2) { background: rgba(239,68,68,0.05); color: #FCA5A5; }
+.compare-table td:nth-child(3) { background: rgba(23,195,178,0.04); color: #99F6E4; }
+
+/* ── PROCESS STEPS ────────────────────────────── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 48px;
+  bottom: 48px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--teal), transparent);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  align-items: start;
+}
+
+.step-num {
+  width: 48px; height: 48px;
+  background: var(--teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--navy);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.step-content {}
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.35rem;
+}
+.step-desc { font-size: 0.9rem; color: var(--slate); }
+
+/* ── CASE STUDY CARDS ────────────────────────── */
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.case-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  transition: transform 0.3s;
+}
+.case-card:hover { transform: translateY(-4px); }
+
+.case-flag {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.case-country {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 0.25rem;
+}
+
+.case-school {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  font-style: italic;
+}
+
+.case-result {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.case-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(23,195,178,0.12);
+  border: 1px solid var(--teal);
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--teal);
+}
+
+/* ── CALLOUT BOX ─────────────────────────────── */
+.callout {
+  background: linear-gradient(135deg, rgba(23,195,178,0.08), rgba(6,90,130,0.08));
+  border: 1px solid var(--teal);
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.callout blockquote {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* ── PILLAR CARDS ─────────────────────────────── */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.pillar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  border-left: 4px solid var(--teal);
+  transition: transform 0.3s;
+}
+.pillar:hover { transform: translateY(-3px); }
+.pillar:nth-child(2) { border-left-color: var(--gold); }
+.pillar:nth-child(3) { border-left-color: var(--orange); }
+.pillar:nth-child(4) { border-left-color: #4895EF; }
+
+.pillar-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.pillar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.75rem;
+}
+
+.pillar-text { font-size: 0.9rem; color: var(--slate); }
+
+/* ── OUTCOMES GRID ────────────────────────────── */
+.outcomes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.outcome-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: box-shadow 0.3s;
+}
+.outcome-item:hover {
+  box-shadow: 0 0 0 1px var(--teal), 0 8px 32px rgba(23,195,178,0.1);
+}
+
+.outcome-icon { font-size: 1.5rem; }
+.outcome-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+.outcome-desc { font-size: 0.85rem; color: var(--slate); }
+
+/* ── RECOMMENDATIONS ─────────────────────────── */
+.recs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.rec-col {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.rec-header {
+  padding: 1.25rem 1.5rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.rec-header.teal   { background: var(--teal); }
+.rec-header.gold   { background: var(--gold); }
+.rec-header.blue   { background: #4895EF; }
+
+.rec-body { padding: 1.25rem 1.5rem; }
+
+.rec-item {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--slate);
+}
+.rec-item::before {
+  content: '→';
+  color: var(--teal);
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+/* ── TOOLS SECTION ────────────────────────────── */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.tool-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.2s;
+}
+.tool-card:hover { transform: translateY(-3px); }
+
+.tool-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.tool-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.35rem;
+}
+
+.tool-desc { font-size: 0.85rem; color: var(--slate); }
+
+/* ── SECTION BG ALTERNATES ───────────────────── */
+.bg-alt {
+  background: rgba(10,37,64,0.4);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  max-width: 100%;
+  padding: 6rem 0;
+}
+.bg-alt > .inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+/* ── FOOTER ───────────────────────────────────── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 4rem 2rem;
+  text-align: center;
+  background: rgba(2,21,38,0.9);
+}
+
+.footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--teal);
+  margin-bottom: 1rem;
+}
+
+.footer-tagline {
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--teal); }
+
+.footer-copy {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── SCROLL REVEAL ────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media (max-width: 768px) {
+  .stats-strip   { grid-template-columns: repeat(2, 1fr); }
+  .pillars       { grid-template-columns: 1fr; }
+  .recs          { grid-template-columns: 1fr; }
+  .nav-links     { display: none; }
+  .compare-table { font-size: 0.8rem; }
+  .compare-table th, .compare-table td { padding: 0.7rem 0.8rem; }
+}
+
+@media (max-width: 480px) {
+  .stats-strip { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── HIGHLIGHT COLORS ─────────────────────────── */
+.c-teal   { color: var(--teal); }
+.c-gold   { color: var(--gold); }
+.c-red    { color: var(--red); }
+.c-orange { color: var(--orange); }
+.c-blue   { color: #4895EF; }
+
+/* Section full-width wrapper */
+.full-section {
+  position: relative;
+  z-index: 1;
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">DTI // EdTech</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#impact">Impact</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#cases">Case Studies</a></li>
+    <li><a href="#outcomes">Outcomes</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="full-section">
+<div class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">DTI Problem Statement &nbsp;·&nbsp; EdTech Initiative</div>
+    <h1 class="hero-title">
+      Educational<br>
+      <span class="accent">Technology</span> Can<br>
+      Replace <span class="gold">Phone Distraction</span>
+    </h1>
+    <p class="hero-sub">
+      Keeping students focused through engaging curriculum &amp; interactive tools — a comprehensive analysis of how EdTech substitutes uncontrolled smartphone use in modern classrooms.
+    </p>
+    <div class="hero-ctas">
+      <a href="#problem" class="btn-primary">↓ Explore the Problem</a>
+      <a href="#solution" class="btn-outline">View Solution →</a>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-item">
+        <div class="stat-num">95%</div>
+        <div class="stat-label">Teens own smartphones</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">72%</div>
+        <div class="stat-label">Check phones in class</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2.5×</div>
+        <div class="stat-label">Better retention w/ EdTech</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">89%</div>
+        <div class="stat-label">Teachers confirm EdTech helps</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PROBLEM SECTION -->
+<div class="full-section" id="problem">
+<div class="bg-alt">
+<div class="inner">
+  <div class="reveal">
+    <p class="section-label">// 01 — The Problem</p>
+    <h2 class="section-title">Uncontrolled Phone Use<br><span class="c-teal">Is Epidemic in Classrooms</span></h2>
+    <p class="section-desc">Smartphones have become the #1 challenge for educators worldwide. The data is clear — and alarming.</p>
+  </div>
+
+  <div class="cards-grid reveal">
+    <div class="card">
+      <span class="card-icon">😴</span>
+      <div class="card-title">Boredom &amp; Disengagement</div>
+      <div class="card-text">Passive, lecture-based teaching fails to stimulate students, pushing them toward phones for instant dopamine rewards their curriculum can't compete with.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">📱</span>
+      <div class="card-title">Habit &amp; Conditioning</div>
+      <div class="card-text">Social media apps are engineered by billion-dollar companies to be addictive. Students face compulsive checking behaviors that are neurologically difficult to resist.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">👥</span>
+      <div class="card-title">Social Pressure &amp; FOMO</div>
+      <div class="card-text">Fear of Missing Out on peer group messages creates a constant psychological pull. Being offline feels socially risky for teenagers.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚫</span>
+      <div class="card-title">Lack of Policies</div>
+      <div class="card-text">Many schools lack clear, consistently enforced phone use guidelines — creating a behavioral vacuum that students naturally fill with personal device use.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">📚</span>
+      <div class="card-title">Curriculum Gaps</div>
+      <div class="card-text">Outdated, non-interactive curriculum cannot compete with the engagement level of smartphones. If class is boring, students vote with their thumbs.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🧠</span>
+      <div class="card-title">Low Self-Regulation</div>
+      <div class="card-text">The adolescent prefrontal cortex is still developing. Impulse control is genuinely harder for teenagers — not an excuse, but an important neurological reality.</div>
+    </div>
+  </div>
+
+  <div class="callout reveal" style="margin-top:3rem">
+    <blockquote>"The biggest threat to modern education is not funding or curriculum — it is the smartphone."</blockquote>
+    <p style="color:var(--muted);margin-top:1rem;font-size:0.85rem">— Education Policy Researcher</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- IMPACT SECTION -->
+<div class="full-section" id="impact">
+<section>
+  <div class="reveal">
+    <p class="section-label">// 02 — The Impact</p>
+    <h2 class="section-title">The Cost of <span class="c-red">Distraction</span></h2>
+    <p class="section-desc">Research across multiple countries documents measurable academic and wellbeing damage from classroom phone use.</p>
+  </div>
+
+  <div class="stats-grid reveal">
+    <div class="stat-card">
+      <span class="big-num c-red">−0.5</span>
+      <span class="desc">GPA drop for frequent in-class phone users</span>
+    </div>
+    <div class="stat-card">
+      <span class="big-num c-orange">−40%</span>
+      <span class="desc">Reduction in memory retention alongside phone distractions</span>
+    </div>
+    <div class="stat-card">
+      <span class="big-num c-gold">−23%</span>
+      <span class="desc">Lower comprehension scores for students who text during lectures</span>
+    </div>
+    <div class="stat-card">
+      <span class="big-num c-red">−18%</span>
+      <span class="desc">Drop in test scores when phones are merely visible on desks</span>
+    </div>
+    <div class="stat-card">
+      <span class="big-num c-orange">68%</span>
+      <span class="desc">Teachers say phones are their single biggest classroom challenge</span>
+    </div>
+    <div class="stat-card">
+      <span class="big-num c-gold">3.5h</span>
+      <span class="desc">Average daily non-academic student screen time</span>
+    </div>
+  </div>
+
+  <div style="margin-top:3rem" class="reveal">
+    <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);margin-bottom:1.5rem;font-weight:700">The Distraction Cycle</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">Passive lesson fails to engage</div>
+          <div class="step-desc">Traditional lecture-based teaching provides no stimulus competitive with smartphones.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">Student reaches for phone</div>
+          <div class="step-desc">Instant dopamine from notifications, videos, and social feeds fills the attention vacuum.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">Critical content is missed</div>
+          <div class="step-desc">Key concepts explained during phone use are lost, creating knowledge gaps.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-title">Gaps make future lessons harder</div>
+          <div class="step-desc">Missed foundations make subsequent content even less comprehensible and more boring.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <div class="step-title">Cycle deepens &amp; repeats</div>
+          <div class="step-desc">Disengagement escalates, phone use increases — the loop tightens with every class.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- SOLUTION SECTION -->
+<div class="full-section" id="solution">
+<div class="bg-alt">
+<div class="inner">
+  <div class="reveal">
+    <p class="section-label">// 03 — The Solution</p>
+    <h2 class="section-title">EdTech as the <span class="c-teal">Substitute</span></h2>
+    <p class="section-desc">Phones aren't bad — they're engaging. The solution is to redirect that engagement toward learning. EdTech uses the same psychology as social media, but channels it into curriculum.</p>
+  </div>
+
+  <div class="callout reveal">
+    <blockquote>"The goal is not a phone-free classroom — it is a phone-purposeful one, where every device use drives learning forward."</blockquote>
+  </div>
+
+  <div class="reveal" style="margin-bottom:3rem">
+    <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);margin-bottom:1.5rem;font-weight:700">Head-to-Head Comparison</h3>
+    <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>📵 Uncontrolled Phone Use</th>
+            <th>✅ EdTech Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Learning Outcome</td><td>Missed content, lower retention</td><td>Active engagement, stronger retention</td></tr>
+          <tr><td>Teacher Authority</td><td>Teacher loses classroom control</td><td>Teacher-guided interactive sessions</td></tr>
+          <tr><td>Skills Developed</td><td>Passive consumption, no learning</td><td>Critical thinking and collaboration</td></tr>
+          <tr><td>Focus Duration</td><td>Fragmented every few minutes</td><td>Sustained through interactive design</td></tr>
+          <tr><td>Academic Results</td><td>Grade decline (documented)</td><td>Improved test scores &amp; participation</td></tr>
+          <tr><td>Student Wellbeing</td><td>Anxiety, FOMO, sleep disruption</td><td>Structured purpose, reduced anxiety</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);margin-bottom:1.5rem;font-weight:700">The Four Pillars</h3>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 01</div>
+        <div class="pillar-title">Engaging Content</div>
+        <div class="pillar-text">Replace passive lectures with multimedia, interactive, and story-driven curriculum that competes directly with entertainment apps for student attention.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 02</div>
+        <div class="pillar-title">Real-Time Interaction</div>
+        <div class="pillar-text">Live polls, quizzes, and collaborative activities give students instant feedback — keeping every student actively involved every minute.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 03</div>
+        <div class="pillar-title">Purposeful Device Use</div>
+        <div class="pillar-text">Channel students' desire to use devices into structured, curriculum-aligned tasks — giving their screen time educational purpose and direction.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">PILLAR 04</div>
+        <div class="pillar-title">Data-Driven Adaptation</div>
+        <div class="pillar-text">EdTech analytics identify disengaged students in real time, enabling teachers to intervene before a student retreats to their phone.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- TOOLS SECTION -->
+<div class="full-section" id="tools">
+<section>
+  <div class="reveal">
+    <p class="section-label">// 04 — EdTech Tools</p>
+    <h2 class="section-title">Interactive Tools That <span class="c-gold">Win Attention</span></h2>
+    <p class="section-desc">These platforms use the same engagement mechanics as social media — but channel them into learning.</p>
+  </div>
+
+  <div class="tools-grid reveal">
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(255,209,102,0.15);color:var(--gold)">Gamified Quizzes</div>
+      <div class="tool-name">Kahoot!</div>
+      <div class="tool-desc">Real-time competitive quizzes with music, points, and leaderboards. Students forget they're studying.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(23,195,178,0.15);color:var(--teal)">Interactive Lessons</div>
+      <div class="tool-name">Nearpod</div>
+      <div class="tool-desc">Teacher-led sessions with embedded polls, VR experiences, and collaborative activities built into every slide.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(72,149,239,0.15);color:#4895EF">Collaboration</div>
+      <div class="tool-name">Padlet</div>
+      <div class="tool-desc">Digital bulletin boards for sharing ideas, brainstorming, and collaborative note-taking as a class.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(249,115,22,0.15);color:var(--orange)">Adaptive Learning</div>
+      <div class="tool-name">Khan Academy</div>
+      <div class="tool-desc">AI-powered platform that adapts difficulty and pace to each student — no two students have the same experience.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(6,167,125,0.15);color:#06A77D">Video Learning</div>
+      <div class="tool-name">Edpuzzle</div>
+      <div class="tool-desc">Turn any video into an interactive lesson with embedded questions, preventing passive watching.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(239,68,68,0.15);color:var(--red)">Assessment</div>
+      <div class="tool-name">Socrative</div>
+      <div class="tool-desc">Real-time quizzes, exit tickets, and space races for formative assessment that students actually enjoy.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(255,209,102,0.15);color:var(--gold)">LMS</div>
+      <div class="tool-name">Google Classroom</div>
+      <div class="tool-desc">The central hub for assignments, grades, announcements, and class communication — free for schools.</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-tag" style="background:rgba(23,195,178,0.15);color:var(--teal)">Discussion</div>
+      <div class="tool-name">Flip (Flipgrid)</div>
+      <div class="tool-desc">Video discussion platform giving every student a voice — especially those too shy to speak in class.</div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- IMPLEMENTATION -->
+<div class="full-section">
+<div class="bg-alt">
+<div class="inner">
+  <div class="reveal">
+    <p class="section-label">// 05 — Implementation</p>
+    <h2 class="section-title">5-Step <span class="c-teal">Roadmap</span></h2>
+    <p class="section-desc">A proven framework for schools to deploy EdTech and eliminate phone distraction.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Establish Policy Framework</div>
+        <div class="step-desc">Co-create clear, fair phone use policies with students, parents, and teachers. Define when devices are tools vs. distractions. Policies co-created with students achieve far higher compliance.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Build Digital Infrastructure</div>
+        <div class="step-desc">Ensure reliable WiFi school-wide, adequate device access through BYOD or school-provided hardware, and responsive IT support. Infrastructure is the non-negotiable foundation.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Invest in Teacher Training</div>
+        <div class="step-desc">Provide professional development on EdTech tools, interactive lesson design, and classroom management. Designate EdTech champions — enthusiastic teachers who train their peers.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Redesign the Curriculum</div>
+        <div class="step-desc">Rebuild lesson plans around 2–3 interactive digital activities per session. Technology must be curriculum-driven and purposeful — not just PowerPoints on a screen.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Pilot, Measure &amp; Scale</div>
+        <div class="step-desc">Run a focused pilot, rigorously measure engagement and academic outcomes, gather feedback, iterate, then scale. Evidence-based expansion wins institutional buy-in.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- CASE STUDIES -->
+<div class="full-section" id="cases">
+<section>
+  <div class="reveal">
+    <p class="section-label">// 06 — Case Studies</p>
+    <h2 class="section-title">Global Schools That <span class="c-teal">Proved It Works</span></h2>
+    <p class="section-desc">Real results from real schools — EdTech-led transformation documented across four countries.</p>
+  </div>
+
+  <div class="case-grid reveal">
+    <div class="case-card">
+      <span class="case-flag">🇫🇮</span>
+      <div class="case-country">Finland</div>
+      <div class="case-school">Helsinki Primary Schools</div>
+      <div class="case-result">Replaced textbooks with iPads + digital curriculum. Student engagement rose 34% in two years. Teacher-reported disruptions dropped by over 50%.</div>
+      <span class="case-badge">+34% engagement</span>
+    </div>
+    <div class="case-card">
+      <span class="case-flag">🇺🇸</span>
+      <div class="case-country">USA</div>
+      <div class="case-school">Mooresville Graded School District</div>
+      <div class="case-result">1:1 Chromebook programme with Google Classroom. Graduation rates rose from 80% to 91% in five years, moving from lowest to highest performers in North Carolina.</div>
+      <span class="case-badge">80% → 91% graduation</span>
+    </div>
+    <div class="case-card">
+      <span class="case-flag">🇸🇬</span>
+      <div class="case-country">Singapore</div>
+      <div class="case-school">MOE Smart Schools Initiative</div>
+      <div class="case-result">Nationwide EdTech rollout with fully interactive curriculum. Singapore ranked #1 globally in maths and science in PISA 2022 — directly linked to tech-integrated learning.</div>
+      <span class="case-badge">#1 PISA 2022</span>
+    </div>
+    <div class="case-card">
+      <span class="case-flag">🇮🇳</span>
+      <div class="case-country">India</div>
+      <div class="case-school">DIKSHA Platform</div>
+      <div class="case-result">Digital Infrastructure for Knowledge Sharing deployed to 250M+ students. Teacher digital competency improved 60% in three years. Rural and urban access democratised.</div>
+      <span class="case-badge">250M+ students reached</span>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- OUTCOMES -->
+<div class="full-section" id="outcomes">
+<div class="bg-alt">
+<div class="inner">
+  <div class="reveal">
+    <p class="section-label">// 07 — Expected Outcomes</p>
+    <h2 class="section-title">What Schools Can <span class="c-teal">Expect</span></h2>
+    <p class="section-desc">Measurable results from schools that successfully implement EdTech as a substitute for uncontrolled phone use.</p>
+  </div>
+
+  <div class="outcomes reveal">
+    <div class="outcome-item">
+      <div class="outcome-icon">🎯</div>
+      <div class="outcome-title">Higher Student Focus</div>
+      <div class="outcome-desc">Sustained attention increases from ~12 min to 25+ min per session with interactive tools</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon">📈</div>
+      <div class="outcome-title">Better Academic Results</div>
+      <div class="outcome-desc">15–30% improvement in test scores in fully EdTech-integrated classrooms</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon">📵</div>
+      <div class="outcome-title">Reduced Phone Distraction</div>
+      <div class="outcome-desc">Purposeful device use cuts off-task phone activity by up to 60% per lesson</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon">👩‍🏫</div>
+      <div class="outcome-title">Empowered Teachers</div>
+      <div class="outcome-desc">Educators regain authority as data-informed facilitators of active learning</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon">💡</div>
+      <div class="outcome-title">21st Century Skills</div>
+      <div class="outcome-desc">Students gain digital literacy, collaboration, and critical thinking for future careers</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon">😌</div>
+      <div class="outcome-title">Improved Wellbeing</div>
+      <div class="outcome-desc">Structured device use reduces FOMO anxiety and improves classroom social dynamics</div>
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div style="margin-top:4rem" class="reveal">
+    <h3 style="font-family:'Syne',sans-serif;font-size:1.4rem;color:var(--white);margin-bottom:1.5rem;font-weight:700">Recommendations</h3>
+    <div class="recs">
+      <div class="rec-col">
+        <div class="rec-header teal">For Schools</div>
+        <div class="rec-body">
+          <div class="rec-item">Adopt 1:1 or BYOD device policy with clear academic-use guidelines</div>
+          <div class="rec-item">Invest in LMS platforms like Google Classroom</div>
+          <div class="rec-item">Establish a digital citizenship curriculum</div>
+          <div class="rec-item">Designate EdTech champion teachers</div>
+        </div>
+      </div>
+      <div class="rec-col">
+        <div class="rec-header gold">For Teachers</div>
+        <div class="rec-body">
+          <div class="rec-item">Use at least one EdTech tool per session</div>
+          <div class="rec-item">Attend EdTech professional development workshops</div>
+          <div class="rec-item">Use platform analytics to spot disengaged students early</div>
+          <div class="rec-item">Design tasks where device use is essential, not optional</div>
+        </div>
+      </div>
+      <div class="rec-col">
+        <div class="rec-header blue">For Policymakers</div>
+        <div class="rec-body">
+          <div class="rec-item">Fund EdTech infrastructure, especially in rural schools</div>
+          <div class="rec-item">Mandate teacher digital competency standards</div>
+          <div class="rec-item">Partner with EdTech companies for subsidised access</div>
+          <div class="rec-item">Commission longitudinal outcome research</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final callout -->
+  <div class="callout reveal" style="margin-top:4rem">
+    <blockquote>"The classroom of the future is not phone-free — it is phone-purposeful. Every device, every screen, every notification redirected toward learning."</blockquote>
+    <p style="color:var(--muted);margin-top:1.5rem;font-size:0.85rem">DTI Problem Statement · Educational Technology Initiative</p>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DTI // EdTech</div>
+  <p class="footer-tagline">Educational Technology Can Substitute Uncontrolled Phone Use — Keeping Students Focused Through Engaging Curriculum &amp; Interactive Tools</p>
+  <div class="footer-links">
+    <a href="#problem">The Problem</a>
+    <a href="#impact">Impact</a>
+    <a href="#solution">Solution</a>
+    <a href="#tools">Tools</a>
+    <a href="#cases">Case Studies</a>
+    <a href="#outcomes">Outcomes</a>
+  </div>
+  <p class="footer-copy">// DTI Problem Statement · Built for GitHub Pages</p>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Stagger children if it's a grid
+      const children = e.target.querySelectorAll('.card, .stat-card, .tool-card, .case-card, .outcome-item, .pillar');
+      children.forEach((child, i) => {
+        child.style.transitionDelay = `${i * 0.07}s`;
+        child.style.opacity = '0';
+        child.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          child.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          child.style.opacity = '1';
+          child.style.transform = 'translateY(0)';
+        }, i * 70);
+      });
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Smooth active nav highlighting
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 200) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current ? 'var(--teal)' : '';
+  });
+});
+</script>
+</body>
+</html>
